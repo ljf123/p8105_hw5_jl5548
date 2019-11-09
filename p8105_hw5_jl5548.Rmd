@@ -60,9 +60,11 @@ Create a tidy dataframe containing data from all participants, including the sub
 * Start with a dataframe containing all file names; the list.files function will help
 
 ```{r}
-df_name = list.files(path = "./data") %>%  
-  as.data.frame() %>% 
-  rename("filename" = ".")
+df_name = list.files(path = "./data") %>%  # create a vector containing all file names
+  as.data.frame() %>%   # turn the vector into a dataframe
+  rename("filename" = ".")  # rename the column as "filename"
+
+# display the dataframe
 df_name
 ```
 
@@ -70,8 +72,12 @@ df_name
 
 ```{r}
 df_long = df_name %>% 
+  # use map to read data into a nested column "data"
   mutate(data = map(.x = paste0("./data/", pull(df_name, filename)), read_csv)) %>% 
+  # unnest the column "data"
   unnest()
+
+# display the dataframe
 df_long
 ```
 
@@ -79,12 +85,18 @@ df_long
 
 ```{r}
 df_long_tidy = df_long %>% 
+  # separate the the column filename into two columns:  "arm" and "subject_id"
   separate(filename, into = c("arm", "subject_id"), sep = "_") %>% 
   mutate(
+    # remove ".csv" at the end of each subject_id
     subject_id = str_remove(subject_id, pattern = ".csv"),
+    # replace "con" as "control" 
     arm = str_replace(arm, "con", "control"),
+    # replace "exp" as "experimental"
     arm = str_replace(arm, "exp", "experimental")
   )
+
+# display the dataframe
 df_long_tidy
 ```
 
