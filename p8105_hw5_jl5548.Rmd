@@ -60,7 +60,7 @@ Create a tidy dataframe containing data from all participants, including the sub
 * Start with a dataframe containing all file names; the list.files function will help
 
 ```{r}
-df_name = list.files(path = "./data") %>% 
+df_name = list.files(path = "./data") %>%  
   as.data.frame() %>% 
   rename("filename" = ".")
 df_name
@@ -78,6 +78,13 @@ df_long
 * Tidy the result; manipulate file names to include control arm and subject ID, make sure weekly observations are “tidy”, and do any other tidying that’s necessary
 
 ```{r}
-
+df_long_tidy = df_long %>% 
+  separate(filename, into = c("arm", "subject_id"), sep = "_") %>% 
+  mutate(
+    subject_id = str_remove(subject_id, pattern = ".csv"),
+    arm = str_replace(arm, "con", "control"),
+    arm = str_replace(arm, "exp", "experimental")
+  )
+df_long_tidy
 ```
 
