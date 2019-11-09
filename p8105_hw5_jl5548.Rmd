@@ -55,5 +55,29 @@ iris_with_missing
 
 ## Problem 2
 
+Create a tidy dataframe containing data from all participants, including the subject ID, arm, and observations over time:
 
+* Start with a dataframe containing all file names; the list.files function will help
+
+```{r}
+df_name = list.files(path = "./data") %>% 
+  as.data.frame() %>% 
+  rename("filename" = ".")
+df_name
+```
+
+* Iterate over file names and read in data for each subject using purrr::map and saving the result as a new variable in the dataframe
+
+```{r}
+df_long = df_name %>% 
+  mutate(data = map(.x = paste0("./data/", pull(df_name, filename)), read_csv)) %>% 
+  unnest()
+df_long
+```
+
+* Tidy the result; manipulate file names to include control arm and subject ID, make sure weekly observations are “tidy”, and do any other tidying that’s necessary
+
+```{r}
+
+```
 
