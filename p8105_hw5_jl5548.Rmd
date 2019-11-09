@@ -100,3 +100,56 @@ df_long_tidy = df_long %>%
 df_long_tidy
 ```
 
+Make a spaghetti plot showing observations on each subject over time, and comment on differences between groups.
+
+```{r}
+# create a dataframe for the plot
+df_plot = df_long_tidy %>% 
+  # convert all observations from week 1 to week 8 into one column "observation" with the label column "week"
+  pivot_longer(
+    cols = week_1:week_8,
+    names_to = "week",
+    values_to = "observation"
+  )
+# make the plot
+plot_long = df_plot %>% 
+  # set values for x and y axes, and different colors according to subject_id
+  ggplot(aes(x = week, y = observation, color = subject_id)) +
+  # add lines to connect observations through 8 weeks for each subject
+  geom_line(aes(group = subject_id)) + 
+  # separate by control and experimental arms
+  facet_grid(.~arm) + 
+  # add titles
+  labs(
+    title = "observations on subjects over 8 weeks in control and experimental arms",
+    x = "week",
+    y = "observation"
+  ) +
+  # adjust the x_axis texts to make it readable
+  theme(axis.text.x = element_text(angle = 90, hjust = 1))
+
+# display the plot
+plot_long
+```
+
+As shown in the plot, at the first week, the experimental arm has overall higher observation value than the control arm. Furthermore, the experimental arm experienced an overall increase in observation value which did not show in the control arm. 
+
+
+
+## Problem 3
+
+In this problem, you will conduct a simulation to explore power in a simple linear regression.
+
+First set the following design elements:
+
+* Fix n=30
+* Fix xi1 as draws from a standard Normal distribution
+* Fix β0=2
+* Fix σ2=50
+
+Set β1=0. Generate 10000 datasets from the model yi = β0 + β1xi1 + ϵi with ϵi∼N[0,σ2]. For each dataset, save β̂1 and the p-value arising from a test of H:β1=0 using α=0.05. Hint: to obtain the estimate and p-value, use broom::tidy to clean the output of lm.
+
+```{r}
+
+```
+
