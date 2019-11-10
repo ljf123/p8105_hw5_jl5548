@@ -239,4 +239,50 @@ As shown in the plot, power increases as the effect size increases.
 
 * Make a plot showing the average estimate of β̂1 on the y axis and the true value of β1 on the x axis. Make a second plot (or overlay on the first) the average estimate of β̂1 only in samples for which the null was rejected on the y axis and the true value of β1 on the x axis. Is the sample average of β̂1 across tests for which the null is rejected approximately equal to the true value of β1? Why or why not?
 
+```{r}
+# create a dataframe for average estimate for β1 in all observations
+beta1_all = sim_results %>% 
+  # group by β1 value
+  group_by(beta1) %>% 
+  # calculate and summarize the average estimate of β1 for all observations
+  summarize(all = mean(beta1_hat))
 
+# create a dataframe for average estimate for β1 in rejected null observations
+beta1_reject = sim_results %>% 
+  # add a column "reject" indicating whether the null was rejected for each row
+  mutate(reject = ifelse(p_value <= 0.05, 1, 0)) %>% 
+  # filter rows where the null was rejected
+  filter(reject == 1) %>% 
+  # group by value of β1
+  group_by(beta1) %>% 
+  # summarize the number of rejected null for each value of β1
+  summarize(reject = mean(beta1_hat))
+
+# join the two dataframes and make the combined plot
+plot_beta1 = left_join(beta1_all, beta1_reject, by = "beta1") %>%  # left join two dataframes by column "beta1"
+  # combine two columns of estimates into one
+  pivot_longer(
+    cols = c(all, reject),
+    names_to = "estimate"
+  ) %>% 
+  # set color according to different estimate groups (all observations or rejected null observations)
+  ggplot(aes(x = beta1, y = value, color = estimate)) +
+  # for points and lines, categorize according to different estimates groups 
+  geom_point(aes(group = estimate)) +
+  geom_line(aes(group = estimate)) +
+  # set the breaks as each value of β1
+  scale_x_continuous(
+    breaks = c(0, 1, 2, 3, 4, 5, 6)
+  ) + 
+  # add titles
+  labs(
+    title = "average estimate of β1 in all simulations and rejected nulls",
+    x = "true value of β1",
+    y = "average estimate of β1"
+  )
+
+# display the plot
+plot_beta1
+```
+
+As shown in the plot, the average estimate of β1 in all simulations for each β1 value equals to the true value of β1 (β1 = (0, 1, 2, 3, 4, 5, 6)). However, the average estimate of β1 in samples for which the null was rejected is not equal to the true values of β1. Since the hypothesis test is β1 = (0, 1, 2, 3, 4, 5, 6) for each β1 value, rejecting the null means that in the corresponding simulation, the probability that the estimated β1 value deviates from the true β1 value is large. Therefore, in these cases which there is a large probability that the estimated β1 value deviates fromthe true β1 value, there should also exist deviation between the average estimate of β1 and true value of β1.
